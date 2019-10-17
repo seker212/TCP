@@ -3,10 +3,10 @@
 
 #### Informacje organizacyjne:
 <ol>
-<li>Plik serwera a.exe jest uruchamialny bez argumentów</li>
-<li>Plik clienta a.exe wymaga podania adresu IPv4 jako argumentu:
-<ol><li>Należy go zatem uruchamiać przy użyciu konsoli np. <code>a.exe 192.168.0.15</code></li>
-<li>W przypadku gdy client i serwer są uruchamiane na tej samej maszynie można użyć <code>a.exe localhost</code></li>
+<li>Plik serwera serwer.exe jest uruchamialny bez argumentów</li>
+<li>Plik clienta client.exe wymaga podania adresu IPv4 jako argumentu:
+<ol><li>Należy go zatem uruchamiać przy użyciu konsoli np. <code>client.exe 192.168.0.15</code></li>
+<li>W przypadku gdy client i serwer są uruchamiane na tej samej maszynie można użyć <code>client.exe localhost</code></li>
 </ol></li>
 <li>Kompilacja przy użyciu MinGW: <code>g++ -g main.cpp -lws2_32</code></li>
 </ol>
