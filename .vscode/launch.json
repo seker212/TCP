@@ -8,15 +8,15 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/serwer.exe",
-            "args": [],
+            "program": "${fileDirname}\\${relativeFileDirname}.exe",
+            "args": [], //IF Client give IP address, IF serwer - don't
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",
             "miDebuggerPath": "D:\\MinGW\\bin\\gdb.exe",
-            "preLaunchTask": "echo",
+            "preLaunchTask": "C++ Build Active File",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
