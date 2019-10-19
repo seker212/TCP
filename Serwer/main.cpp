@@ -50,6 +50,12 @@ int __cdecl main(void)
 	int iSendResult;
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
+	
+	int sessionID;
+	std::string operation;
+	std::string answer;
+	std::string number;
+	std::string message;
 
 	// Initialize Winsock
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -116,6 +122,7 @@ int __cdecl main(void)
 	// Receive until the peer shuts down the connection
 	//std::string cos;
 	bool stay = 1;
+	sessionID = randomInt(1, 100);
 	do {
 		//iResult = listen(ListenSocket, SOMAXCONN);
 		//ClientSocket = accept(ListenSocket, NULL, NULL);
