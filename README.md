@@ -3,7 +3,7 @@
 
 #### Informacje organizacyjne:
 <ol>
-  <li>Kolejność #inclide jest istotna przy kompilacji MinGW. <strong>NIE</strong> zmieniać jej</li>
+  <li>Kolejność #include jest istotna przy kompilacji MinGW. <strong>NIE</strong> zmieniać jej</li>
 <li>Plik serwera serwer.exe jest uruchamialny bez argumentów</li>
 <li>Plik clienta Client.exe wymaga podania adresu IPv4 jako argumentu:
 <ol><li>Należy go zatem uruchamiać przy użyciu konsoli np. <code>Client.exe 192.168.0.15</code></li>
