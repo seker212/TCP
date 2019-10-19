@@ -11,6 +11,8 @@
 #include <string>
 #include <iostream>
 
+#include <random>
+
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "ws2_32.lib")
 // #pragma comment (lib, "Mswsock.lib")
@@ -27,6 +29,12 @@ std::string buf_to_msg(char buffer[DEFAULT_BUFLEN], int bytes) {
 	return result;
 }
 
+int randomInt(int min, int max)
+{
+	static std::default_random_engine e{};
+	std::uniform_int_distribution<int > d(min, max);
+	return d(e);
+}
 
 int __cdecl main(void)
 {
@@ -117,6 +125,23 @@ int __cdecl main(void)
 			printf("Message received: %s\n", recvbuf);
 			std::string msg = buf_to_msg(recvbuf, iResult);
 			std::cout << std::endl << msg << std::endl;
+			
+			//
+			//interpretacja komunikatu
+			operation = msg.substr(0, 3);
+			answer = msg.substr(3, 4);
+			number = msg.substr(7, 10);  //number = msg.substr(7, 64);
+			std::cout << operation << " " << answer << " " << number << std::endl;
+
+			//coś
+
+			//wysłanie komunikatu
+			//operation = 
+			//answer = 
+			//number = 
+			message = operation + answer + number + "0";
+			//
+			
 			// Echo the buffer back to the sender
 			iSendResult = send(ClientSocket, recvbuf, iResult, 0);
 			if (iSendResult == SOCKET_ERROR) {
