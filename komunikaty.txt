@@ -3,8 +3,9 @@ KOMUNIKATY
 Klient:
 Operacja:
 0010 - wysłanie zaproszenia
-0011 - przyjęcie/odrzucenie
-0100 - przesłanie wiadomości
+0011 - przyjęcie zaproszenia
+0100 - odrzucenie zaproszenia
+0111 - przesłanie wiadomości
 
 Odpowiedź: 000
 
