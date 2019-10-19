@@ -5,14 +5,14 @@
 <ol>
   <li>Kolejność #inclide jest istotna przy kompilacji MinGW. <strong>NIE</strong> zmieniać jej</li>
 <li>Plik serwera serwer.exe jest uruchamialny bez argumentów</li>
-<li>Plik clienta client.exe wymaga podania adresu IPv4 jako argumentu:
-<ol><li>Należy go zatem uruchamiać przy użyciu konsoli np. <code>client.exe 192.168.0.15</code></li>
-<li>W przypadku gdy client i serwer są uruchamiane na tej samej maszynie można użyć <code>client.exe localhost</code></li>
+<li>Plik clienta Client.exe wymaga podania adresu IPv4 jako argumentu:
+<ol><li>Należy go zatem uruchamiać przy użyciu konsoli np. <code>Client.exe 192.168.0.15</code></li>
+<li>W przypadku gdy client i serwer są uruchamiane na tej samej maszynie można użyć <code>Client.exe localhost</code></li>
 </ol></li>
 <li>Kompilacja przy użyciu MinGW:</li>
   <ul>
-  <li>Serwer: <code>g++ -g main.cpp -o serwer.exe -lws2_32</code></li>
-  <li>Client: <code>g++ -g main.cpp -o client.exe -lws2_32</code></li>
+  <li>Serwer: <code>g++ -g main.cpp -o Serwer.exe -lws2_32</code></li>
+  <li>Client: <code>g++ -g main.cpp -o Client.exe -lws2_32</code></li>
   </ul>
 </ol>
 
