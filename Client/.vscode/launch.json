@@ -5,7 +5,8 @@
             "name": "CodeLens (Launch) - Client",
             "request": "launch",
             "mainClass": "Client",
-            "projectName": "Client"
+            "projectName": "Client",
+            "args": "localhost"
         }
     ]
 }
