@@ -3,7 +3,7 @@
 
 #### Polecenie:
 <ul>
-<strong>Wariant 8 – model komunikacji 1↔1</strong>
+<strong>Wariant 8 – model komunikacji 2↔1</strong>
 <li>Protokół warstwy transportowej: TCP.</li>
 <li>Struktura nagłówka protokołu binarnego: pole operacji (4 bity), pole odpowiedzi (3 bity), pole
 długości danych (64 bity), pole danych o zmiennym rozmiarze, dodatkowe pola zdefiniowane przez
