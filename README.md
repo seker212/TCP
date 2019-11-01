@@ -2,7 +2,7 @@
 ### TS_lab_project
 
 #### TODO:
- - [ ] Konstrukcja nagłówka
+ - [x] Konstrukcja nagłówka
  - [ ] Forma konstruowania komunikatu przez klientów
  - [ ] Wysyłanie i odbieranie komunikatu
 
@@ -38,3 +38,6 @@ programistę (następujące po polu danych).</li>
 <ul>
 <li>[ ] identyfikator sesji powinien być przesyłany w każdym komunikacie.</li>
 </ul></ul>
+
+##### Notes:
+ - https://www.asciitohex.com
