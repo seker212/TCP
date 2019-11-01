@@ -65,6 +65,7 @@ public class Client {
             "Screen name selection",
             JOptionPane.PLAIN_MESSAGE
         );
+        
     }
 
     private void run() throws IOException {
