@@ -1,7 +1,7 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -28,7 +28,7 @@ public class Client {
 
     String serverAddress;
     Scanner in;
-    PrintWriter out;
+    DataOutputStream out;
     JFrame frame = new JFrame("Chatter");
     JTextField textField = new JTextField(50);
     JTextArea messageArea = new JTextArea(16, 50);
@@ -43,16 +43,28 @@ public class Client {
     public Client(String serverAddress) {
         this.serverAddress = serverAddress;
 
-        textField.setEditable(false);
+        textField.setEditable(true);
         messageArea.setEditable(false);
         frame.getContentPane().add(textField, BorderLayout.SOUTH);
         frame.getContentPane().add(new JScrollPane(messageArea), BorderLayout.CENTER);
         frame.pack();
 
-        // Send on enter then clear to prepare for next message
+        // Send textField on enter then clear to prepare for next message
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                out.println(textField.getText());
+                System.out.println(e.toString() + "\n------------- Event -------------------\n");
+                System.out.println(e.getSource().toString()+"\n------------- Source -------------------\n");
+                byte test1 = 5;
+                byte test2 = -1;
+                header test3 = new header(test1, true, e.getActionCommand(),test2);
+                try {
+                    out.write(test3.getBinHeader());
+                } catch (IOException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+
+                // out.println(textField.getText());
                 textField.setText("");
             }
         });
@@ -65,19 +77,18 @@ public class Client {
             "Screen name selection",
             JOptionPane.PLAIN_MESSAGE
         );
-        
     }
 
     private void run() throws IOException {
         try {
             Socket socket = new Socket(serverAddress, 59001);
             in = new Scanner(socket.getInputStream());
-            out = new PrintWriter(socket.getOutputStream(), true);
+            out = new DataOutputStream(socket.getOutputStream());
 
             while (in.hasNextLine()) {
                 String line = in.nextLine();
                 if (line.startsWith("SUBMITNAME")) {
-                    out.println(getName());
+                    out.writeUTF(getName());
                 } else if (line.startsWith("NAMEACCEPTED")) {
                     this.frame.setTitle("Chatter - " + line.substring(13));
                     textField.setEditable(true);

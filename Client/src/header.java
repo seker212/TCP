@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * header
@@ -39,13 +40,15 @@ public class header {
     public byte[] getBinHeader(){
         ArrayList<Byte> array_out = new ArrayList<Byte>();
 
-        array_out.add(new Byte(_operationAndAnswer));
-                
         long tmp_dataLength = _dataLength;
-        for (int i = 8;i>=0;i--){
+        for (int i = 0;i < 8;i++){
             array_out.add(new Byte((byte) tmp_dataLength));
             tmp_dataLength >>>= 8;
         }
+
+        array_out.add(new Byte(_operationAndAnswer));
+
+        Collections.reverse(array_out);
 
         byte[] dataString = _data.getBytes();
         for (var el : dataString){
@@ -66,8 +69,7 @@ public class header {
         for (int i = 0; i < out.length; i++){
             out[i] <<= 1;
             //if most significant bit of out[i+1] == 1
-            //FIXME: What will happend when out[i+1] won't exist?
-            if (((out[i+1] >> 7) & 1) == 1){
+            if (i != out.length - 1 && ((out[i+1] >> 7) & 1) == 1){
                 out[i] += 0b1;
             }
         }
