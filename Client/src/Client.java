@@ -52,8 +52,8 @@ public class Client {
         // Send textField on enter then clear to prepare for next message
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println(e.toString() + "\n------------- Event -------------------\n");
-                System.out.println(e.getSource().toString()+"\n------------- Source -------------------\n");
+                // System.out.println(e.toString() + "\n------------- Event -------------------\n");
+                // System.out.println(e.getSource().toString()+"\n------------- Source -------------------\n");
                 byte test1 = 5;
                 byte test2 = -1;
                 header test3 = new header(test1, true, e.getActionCommand(),test2);

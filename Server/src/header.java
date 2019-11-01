@@ -1,3 +1,5 @@
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -31,6 +33,10 @@ public class header {
         this._sessionID = sessionID;
 
  
+    }
+
+    public header(DataInputStream inputStream) throws IOException{
+        
     }
 
     /**
