@@ -84,7 +84,14 @@ public class Server {
                         //move first 9 bytes of header 1 bit right
                         for (int i = 8; i >= 0; i--){
                             //wypycha najmniej znaczacy bit
-                            byte tmpByte = (byte) (inputABytes.get(i).byteValue() >>> 1); //FIXME: >>> works as if it's >>
+                            byte tmpByte = (byte) (inputABytes.get(i).byteValue() >> 1);
+                            
+                            //FIX
+                            if ((tmpByte >> 7 & 1) == 1){
+                                tmpByte -= 0b10000000;
+                            }
+
+
                             //if least significant bit of i-1 == 1
                             if (i > 0 && ((inputABytes.get(i-1).byteValue() & 1) == 1)){
                                 tmpByte += 0b10000000;
@@ -108,7 +115,13 @@ public class Server {
 
                         //move data and session ID by 1 bit right (usuwa dopelnienie)
                         for (int i = (dataAndSessionID.length-1); i >= 0; i--) {
-                            dataAndSessionID[i] >>>= 1; //FIXME: >>> works as if it's >>
+                            dataAndSessionID[i] >>= 1;
+                            
+                            //FIX
+                            if ((dataAndSessionID[i] >> 7 & 1) == 1){
+                                dataAndSessionID[i] -= 0b10000000;
+                            }
+
                             if (i > 0 && ((dataAndSessionID[i-1] & 1) == 1)){
                                 dataAndSessionID[i] += 0b10000000;
                             }

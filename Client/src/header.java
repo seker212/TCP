@@ -43,7 +43,7 @@ public class header {
         long tmp_dataLength = _dataLength;
         for (int i = 0;i < 8;i++){
             array_out.add((byte) tmp_dataLength);
-            tmp_dataLength >>>= 8;
+            tmp_dataLength >>= 8;
         }
 
         array_out.add(_operationAndAnswer);
