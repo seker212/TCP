@@ -1,20 +1,25 @@
-### Operation ID codes
+### Operation ID codes:
 
-ID (dec) | ID (hex) | ID (bin) | Description | Sender
---- | --- | --- | --- | ---
-0 | 0 | 0000 | set sessionID | Server
-1 | 1 | 0001 | set name | Client
-2 | 2 | 0010 | new client available | Server
-3 | 3 | 0011 | search for other client | Client
-4 | 4 | 0100 | no other clients available | Server
-5 | 5 | 0101 | send room invitation | Client
-6 | 6 | 0110 | forward room invitation | Server
-7 | 7 | 0111 | accept room invitation | Client
-8 | 8 |1000 | refuse room invitation | Client
-9 | 9 | 1001 | client has joined the room | Server
-10 | A | 1010 | client has left the room | Server
-11 | B | 1011 | send message | Client
-12 | C | 1100 | broadcast message | Server
-13 | D | 1101 | leave room | Client
-14 | E | 1110 | disconnect | Client
-15 | F | 1111 | ERROR | Client, Server
+ID (dec) | ID (hex) | ID (bin) | Description | data (String) | Sender
+--- | --- | --- | --- | --- | ---
+0 | 0 | 0000 | set sessionID | _none_ | Server
+1 | 1 | 0001 | set name | `name` | Client
+2 | 2 | 0010 | new client available | `client name` | Server
+3 | 3 | 0011 | search for other client | _none_ | Client
+4 | 4 | 0100 | no other clients available | _none_ | Server
+5 | 5 | 0101 | send room invitation | `client name` | Client
+6 | 6 | 0110 | forward room invitation | `sending client name` | Server
+7 | 7 | 0111 | accept room invitation | _none_ | Client
+8 | 8 | 1000 | refuse room invitation | _none_ | Client
+9 | 9 | 1001 | client has joined the room | `client name` | Server
+10 | A | 1010 | client has left the room | `client name` | Server
+11 | B | 1011 | send message | `message` | Client
+12 | C | 1100 | broadcast message | `name`: `message` | Server
+13 | D | 1101 | leave room | _none_ | Client
+14 | E | 1110 | disconnect | _none_ | Client
+15 | F | 1111 | ERROR | `error code` | Client, Server
+
+
+### Notes:
+ - `name` is sending client's name
+ - `client name` is **the other** client's name
