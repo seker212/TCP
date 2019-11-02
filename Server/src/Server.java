@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Set;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -67,76 +66,14 @@ public class Server {
             try {
                 in = new DataInputStream(socket.getInputStream());
                 out = new DataOutputStream(socket.getOutputStream());
-                ArrayList<Byte> inputABytes = new ArrayList<Byte>();
                 
                 while (true) {
-                    byte inputByte = in.readByte();
-                    inputABytes.add(inputByte);
-                    if (inputABytes.size() == 9){
+                    header command = new header();
+                    command.readHeader(in);
 
-                        // save first bit of data String
-                        // if least significat bit of first byte is 1
-                        byte firstDataBit = 0;
-                        if ((inputABytes.get(0).byteValue() & 1) == 1){
-                            firstDataBit = 1;
-                        }
-                        
-                        //move first 9 bytes of header 1 bit right
-                        for (int i = 8; i >= 0; i--){
-                            //wypycha najmniej znaczacy bit
-                            byte tmpByte = (byte) (inputABytes.get(i).byteValue() >> 1);
-                            
-                            //FIX
-                            if ((tmpByte >> 7 & 1) == 1){
-                                tmpByte -= 0b10000000;
-                            }
-
-
-                            //if least significant bit of i-1 == 1
-                            if (i > 0 && ((inputABytes.get(i-1).byteValue() & 1) == 1)){
-                                tmpByte += 0b10000000;
-                            }
-                            inputABytes.set(i, tmpByte);
-                        }
-
-                        //read dataLength
-                        long dataLength = 0;
-                        for (int i = 1; i < 9; i++) {
-                            dataLength += inputABytes.get(i);
-                            if (i < 8)
-                            dataLength <<= 8;
-                        }
-                        
-                        //read data and sessionID
-                        byte[] dataAndSessionID = new byte[(int) dataLength + 1]; 
-                        for (int i = 0; i < dataAndSessionID.length; i++) {
-                            dataAndSessionID[i] = in.readByte();
-                        }
-
-                        //move data and session ID by 1 bit right (usuwa dopelnienie)
-                        for (int i = (dataAndSessionID.length-1); i >= 0; i--) {
-                            dataAndSessionID[i] >>= 1;
-                            
-                            //FIX
-                            if ((dataAndSessionID[i] >> 7 & 1) == 1){
-                                dataAndSessionID[i] -= 0b10000000;
-                            }
-
-                            if (i > 0 && ((dataAndSessionID[i-1] & 1) == 1)){
-                                dataAndSessionID[i] += 0b10000000;
-                            }
-                        }
-                        if (firstDataBit == 1){
-                            dataAndSessionID[0] += 0b10000000;
-                        }
-
-                        // header command = new header(inputABytes.get(0) , new String(dataAndSessionID, 0, (int)dataLength), dataAndSessionID[dataAndSessionID.length-1]);
-                        System.out.println(inputABytes.get(0)); 
-                        System.out.println(new String(dataAndSessionID, 0, (int)dataLength));
-                        System.out.println(dataAndSessionID[dataAndSessionID.length-1]);
-                        inputABytes.clear();
-                    }
-                    
+                    /*
+                    Handle command
+                    */
                 }
             } catch (Exception e) {
                 System.out.println(e);

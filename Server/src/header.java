@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * header
- * For test the operationID is 5 bit long instead of 4 bits and starts with '0'
+ * header object
+ * @param operationID - 4 bits, operation number, range form 0 to 15
+ * @param Answer - 3 bits, '000' for client; '111' for server answer
+ * @param dataLength 64 bits [8 bytes], length of data field in bytes
+ * @param data - data in form of String
+ * @param sessionID - 8 bits [1 byte], random for each client-server session
  */
 public class header {
     private byte _operationAndAnswer;   // 4 bits op + 3 bits answer
@@ -14,21 +18,23 @@ public class header {
     private byte _sessionID;            // 1 byte
 
     /**
-     * 
-     * @param operationID range form 0 to 15
-     * @param answear 0 for client, 1 for server answear
-     * @param data_length number of characters (bytes) of data param
-     * @param data required
-     * @param sessionID 
+     * Creates a new header filled with 0s and empty data field
      */
-
     public header(){
         this._operationAndAnswer = 0;
         this._dataLength = 0;
         this._data = "";
         this._sessionID = 0;
     }
-
+    
+    /**
+     * Creastes a new header with given parameters
+     * @param operationID operation number, range form 0 to 15
+     * @param answear 0 for client, 1 for server answear
+     * @param data required;  mainly a String holding a message
+     * @param sessionID reqiured; A random number given by a server for communication
+     * @return header object
+     */
     public header(byte operationID, boolean answear, String data, byte sessionID){
         int tmp_convert = operationID << 3;
         if (answear)
@@ -40,6 +46,12 @@ public class header {
         this._sessionID = sessionID;
     }
 
+    /**
+     * Creastes a new header with given parameters
+     * @param operationAndAnswer one parmeter for operation number and answer. Binary should start with '0' followed by 4 bits of operation number and 3 bits of answer
+     * @param data required;  mainly a String holding a message
+     * @param sessionID reqiured; A random number given by a server for communication
+     */
     public header(byte operationAndAnswer, String data, byte sessionID){
         this._operationAndAnswer = operationAndAnswer;
         this._dataLength = data.length();
@@ -47,13 +59,60 @@ public class header {
         this._sessionID = sessionID;
     }
 
-    public header(DataInputStream inputStream) throws IOException{
-        
+    /**
+     * Gets information about operation type form header
+     * @return operation number form 0 to 15
+     */
+    public int getOperationID(){
+        return (_operationAndAnswer >> 3);
+    }
+
+    /**
+     * Gets information about answer form header
+     * @return true for '111'; false for '000'
+     */
+    public boolean getAnswer(){
+        return ((_operationAndAnswer & 7) == 7);
+    }
+
+    /**
+     * Gets information about size of data string form header
+     * @return data string size in bytes
+     */
+    public long getDataLength(){
+        return _dataLength;
+    }
+
+    /**
+     * Gets information data form header
+     * @return String of data, mainly a message
+     */
+    public String getData(){
+        return _data;
+    }
+
+    /**
+     * Gets session identifier form header
+     * @return 8 bit identification number of a session
+     */
+    public byte getSessionID(){
+        return _sessionID;
+    }
+
+    /**
+     * Prints formated representation of header object on console using {@code System.out.print()} 
+     */
+    public void printSystem(){
+        System.out.println("Operation number: " + getOperationID());
+        System.out.println("Answer: " + (getAnswer()?"111":"000"));
+        System.out.println("Data length: " + _dataLength);
+        System.out.println("Data: " + _data);
+        System.out.println("Session identifier: " + _sessionID);
     }
 
     /**
      * Chages header into byte array for output
-     * @return byte[]
+     * @return Array of bytes with a single 0 as a complement at the end
      */
     public byte[] getBinHeader(){
         ArrayList<Byte> array_out = new ArrayList<Byte>();
@@ -79,10 +138,8 @@ public class header {
         for (int i=0;i<array_out.size();i++){
             out[i] = array_out.get(i).byteValue();
         }
-
-        //TODO: activate for loop to move 
-        //moving bytes
-        /*
+ 
+        //moving bytes        
         for (int i = 0; i < out.length; i++){
             out[i] <<= 1;
             //if most significant bit of out[i+1] == 1
@@ -90,9 +147,100 @@ public class header {
                 out[i] += 0b1;
             }
         }
-        */
+        
 
         return out;
+    }
+
+    /**
+     * Reads binary input stream and fills header object with it.
+     * @param inputStream Data stream of header instance
+     * @return true of header isn't empty after reading input; false if header is empty
+     * @throws IOException
+     */
+    public boolean readHeader(DataInputStream inputStream) throws IOException{
+        ArrayList<Byte> inputABytes = new ArrayList<Byte>();
+        while (inputABytes.size() < 9){
+        byte inputByte = inputStream.readByte();
+        inputABytes.add(inputByte);
+        }
+
+        if (inputABytes.size() == 9){
+
+            // save first bit of data String
+            // if least significat bit of first byte is 1
+            byte firstDataBit = 0;
+            if ((inputABytes.get(0).byteValue() & 1) == 1){
+                firstDataBit = 1;
+            }
+            
+            //move first 9 bytes of header 1 bit right
+            for (int i = 8; i >= 0; i--){
+                //wypycha najmniej znaczacy bit
+                byte tmpByte = (byte) (inputABytes.get(i).byteValue() >> 1);
+                
+                //FIX
+                if ((tmpByte >> 7 & 1) == 1){
+                    tmpByte -= 0b10000000;
+                }
+
+
+                //if least significant bit of i-1 == 1
+                if (i > 0 && ((inputABytes.get(i-1).byteValue() & 1) == 1)){
+                    tmpByte += 0b10000000;
+                }
+                inputABytes.set(i, tmpByte);
+            }
+
+            //read dataLength
+            long dataLength = 0;
+            for (int i = 1; i < 9; i++) {
+                dataLength += inputABytes.get(i);
+                if (i < 8)
+                dataLength <<= 8;
+            }
+            
+            //read data and sessionID
+            byte[] dataAndSessionID = new byte[(int) dataLength + 1]; 
+            for (int i = 0; i < dataAndSessionID.length; i++) {
+                dataAndSessionID[i] = inputStream.readByte();
+            }
+
+            //move data and session ID by 1 bit right (usuwa dopelnienie)
+            for (int i = (dataAndSessionID.length-1); i >= 0; i--) {
+                dataAndSessionID[i] >>= 1;
+                
+                //FIX
+                if ((dataAndSessionID[i] >> 7 & 1) == 1){
+                    dataAndSessionID[i] -= 0b10000000;
+                }
+
+                if (i > 0 && ((dataAndSessionID[i-1] & 1) == 1)){
+                    dataAndSessionID[i] += 0b10000000;
+                }
+            }
+            if (firstDataBit == 1){
+                dataAndSessionID[0] += 0b10000000;
+            }
+            
+            this._operationAndAnswer = inputABytes.get(0);
+            this._dataLength = dataLength;
+            this._data = new String(dataAndSessionID, 0, (int)dataLength);
+            this._sessionID = dataAndSessionID[dataAndSessionID.length-1];
+
+            inputABytes.clear();
+        }
+        if (
+            _operationAndAnswer != 0 &&
+            _dataLength != 0 &&
+            !(_data.isEmpty()) &&
+            _sessionID != 0
+        ){ 
+            return true; 
+        }else{
+            return false;
+        }
+
     }
     
 
