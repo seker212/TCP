@@ -8,10 +8,10 @@ import java.util.Collections;
  * For test the operationID is 5 bit long instead of 4 bits and starts with '0'
  */
 public class header {
-    private byte _operationAndAnswer;
-    private long _dataLength;
-    private String _data;
-    private byte _sessionID;
+    private byte _operationAndAnswer;   // 4 bits op + 3 bits answer
+    private long _dataLength;           // 3 bits
+    private String _data;               // x bytes
+    private byte _sessionID;            // 1 byte
 
     /**
      * 
@@ -22,6 +22,13 @@ public class header {
      * @param sessionID 
      */
 
+    public header(){
+        this._operationAndAnswer = 0;
+        this._dataLength = 0;
+        this._data = "";
+        this._sessionID = 0;
+    }
+
     public header(byte operationID, boolean answear, String data, byte sessionID){
         int tmp_convert = operationID << 3;
         if (answear)
@@ -31,8 +38,13 @@ public class header {
         this._dataLength = data.length();
         this._data = data;
         this._sessionID = sessionID;
+    }
 
- 
+    public header(byte operationAndAnswer, String data, byte sessionID){
+        this._operationAndAnswer = operationAndAnswer;
+        this._dataLength = data.length();
+        this._data = data;
+        this._sessionID = sessionID;
     }
 
     public header(DataInputStream inputStream) throws IOException{

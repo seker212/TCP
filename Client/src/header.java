@@ -64,7 +64,7 @@ public class header {
 
         //TODO: activate for loop to move 
         //moving bytes
-        /*
+        
         for (int i = 0; i < out.length; i++){
             out[i] <<= 1;
             //if most significant bit of out[i+1] == 1
@@ -72,7 +72,7 @@ public class header {
                 out[i] += 0b1;
             }
         }
-        */
+        
 
         return out;
     }
