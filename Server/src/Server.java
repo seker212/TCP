@@ -66,10 +66,14 @@ public class Server {
             try {
                 in = new DataInputStream(socket.getInputStream());
                 out = new DataOutputStream(socket.getOutputStream());
+                header command = new header();
+                header test = new header((byte)0, true, "lol", (byte) 64);
                 
                 while (true) {
-                    header command = new header();
                     command.readHeader(in);
+                    command.printSystem();
+                    out.write(test.getBinHeader());
+
 
                     /*
                     Handle command

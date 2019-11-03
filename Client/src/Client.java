@@ -1,9 +1,9 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
 
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
@@ -27,11 +27,13 @@ import javax.swing.JTextField;
 public class Client {
 
     String serverAddress;
-    Scanner in;
+    DataInputStream in;
     DataOutputStream out;
-    JFrame frame = new JFrame("Chatter");
+    JFrame frame = new JFrame("Chat");
     JTextField textField = new JTextField(50);
     JTextArea messageArea = new JTextArea(16, 50);
+    byte _sessionID = 0;
+    String _name = "";
 
     /**
      * Constructs the client by laying out the GUI and registering a listener with the
@@ -43,7 +45,7 @@ public class Client {
     public Client(String serverAddress) {
         this.serverAddress = serverAddress;
 
-        textField.setEditable(true);
+        textField.setEditable(false);
         messageArea.setEditable(false);
         frame.getContentPane().add(textField, BorderLayout.SOUTH);
         frame.getContentPane().add(new JScrollPane(messageArea), BorderLayout.CENTER);
@@ -52,19 +54,41 @@ public class Client {
         // Send textField on enter then clear to prepare for next message
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // System.out.println(e.toString() + "\n------------- Event -------------------\n");
-                // System.out.println(e.getSource().toString()+"\n------------- Source -------------------\n");
-                byte test1 = 5;
-                byte test2 = -1;
-                header test3 = new header(test1, true, e.getActionCommand(),test2);
+                String textMsg = textField.getText();
                 try {
-                    out.write(test3.getBinHeader());
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    if (textMsg.startsWith("\\"))
+                    {
+                        if (textMsg.substring(1) == "search")
+                        {
+                            out.write(new header(3,false, "", _sessionID).getBinHeader());
+                        }
+                        else if (textMsg.substring(1, 9) == "sendinv ")
+                        {
+                            out.write(new header(5,false, textMsg.substring(9), _sessionID).getBinHeader());
+                        }
+                        else if (textMsg.substring(1) == "accept")
+                        {
+                            out.write(new header(7,false, "", _sessionID).getBinHeader());
+                        }
+                        else if (textMsg.substring(1) == "refuse")
+                        {
+                            out.write(new header(8,false, "", _sessionID).getBinHeader());
+                        }
+                        else if (textMsg.substring(1) == "leave")
+                        {
+                            out.write(new header(13,false, "", _sessionID).getBinHeader());
+                        }
+                        else if (textMsg.substring(1) == "exit")
+                        {
+                            out.write(new header(14,false, "", _sessionID).getBinHeader());
+                        }
+                    }else
+                    {
+                        out.write(new header(11, false, textMsg, _sessionID).getBinHeader());
+                    }
+                } catch (Exception f) {
+                    //TODO: handle exception
                 }
-
-                // out.println(textField.getText());
                 textField.setText("");
             }
         });
@@ -82,19 +106,90 @@ public class Client {
     private void run() throws IOException {
         try {
             Socket socket = new Socket(serverAddress, 59001);
-            in = new Scanner(socket.getInputStream());
+            in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+            header command = new header();
 
-            while (in.hasNextLine()) {
-                String line = in.nextLine();
-                if (line.startsWith("SUBMITNAME")) {
-                    out.writeUTF(getName());
-                } else if (line.startsWith("NAMEACCEPTED")) {
-                    this.frame.setTitle("Chatter - " + line.substring(13));
-                    textField.setEditable(true);
-                } else if (line.startsWith("MESSAGE")) {
-                    messageArea.append(line.substring(8) + "\n");
+            while (command.readHeader(in)) {
+                //TODO: Command handling
+
+                if (command.getOperationID() == 0){
+                    _sessionID = command.getSessionID();
+                    _name = getName();
+                    out.write(new header(1, false, _name, _sessionID).getBinHeader());
                 }
+                if (command.getSessionID() == _sessionID){
+                    if(command.getOperationID() == 1)
+                    {
+                        if (command.getAnswer() && command.getData() == _name){
+                            this.frame.setTitle("Chat - " + _name);
+                            textField.setEditable(true);
+                        }else if(!command.getAnswer() && command.getData() == _name)/* name taken */{
+                            _name = getName();
+                            out.write(new header(1, false, _name, _sessionID).getBinHeader());
+                        }
+                    }
+                    else if(command.getOperationID() == 2)
+                    {
+    
+                    }
+                    else if(command.getOperationID() == 3)
+                    {
+                        
+                    }
+                    else if(command.getOperationID() == 4)
+                    {
+    
+                    }
+                    else if(command.getOperationID() == 5)
+                    {
+    
+                    }
+                    else if(command.getOperationID() == 6)
+                    {
+    
+                    }
+                    else if(command.getOperationID() == 7)
+                    {
+    
+                    }
+                    else if(command.getOperationID() == 8)
+                    {
+    
+                    }
+                    else if(command.getOperationID() == 9)
+                    {
+    
+                    }
+                    else if(command.getOperationID() == 10)
+                    {
+    
+                    }
+                    else if(command.getOperationID() == 11)
+                    {
+    
+                    }
+                    else if(command.getOperationID() == 12)
+                    {
+    
+                    }
+                    else if(command.getOperationID() == 13)
+                    {
+    
+                    }
+                    else if(command.getOperationID() == 14)
+                    {
+                        // socket.close();
+    
+                    }
+                    else if(command.getOperationID() == 15)
+                    {
+                    }
+
+                }
+                
+
+
             }
         } finally {
             frame.setVisible(false);

@@ -46,6 +46,19 @@ public class header {
         this._sessionID = sessionID;
     }
 
+    public header(int operationID, boolean answear, String data, int sessionID){
+        byte opID_byte = (byte)operationID;
+        byte sessionID_byte = (byte) sessionID;
+        int tmp_convert = opID_byte << 3;
+        if (answear)
+            tmp_convert += 0b111;
+        
+        this._operationAndAnswer = (byte) tmp_convert;
+        this._dataLength = data.length();
+        this._data = data;
+        this._sessionID = sessionID_byte;
+    }
+
     /**
      * Creastes a new header with given parameters
      * @param operationAndAnswer one parmeter for operation number and answer. Binary should start with '0' followed by 4 bits of operation number and 3 bits of answer
@@ -231,14 +244,14 @@ public class header {
             inputABytes.clear();
         }
         if (
-            _operationAndAnswer != 0 &&
-            _dataLength != 0 &&
-            !(_data.isEmpty()) &&
-            _sessionID != 0
+            _operationAndAnswer == 0 &&
+            _dataLength == 0 &&
+            _data.isEmpty() &&
+            _sessionID == 0
         ){ 
-            return true; 
+            return false; 
         }else{
-            return false;
+            return true;
         }
 
     }
