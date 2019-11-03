@@ -3,8 +3,12 @@
 
 #### TODO:
  - [x] Konstrukcja nagłówka
- - [ ] Forma konstruowania komunikatu przez klientów
- - [ ] Wysyłanie i odbieranie komunikatu
+ - [x] Forma konstruowania komunikatu przez klientów
+ - [x] Wysyłanie i odbieranie komunikatu
+ - [ ] Wysyłanie przez serwer komunikatu do **wskazanego** klienta (Unicast)
+ - [ ] Wysyłanie przez serwer komuniaktu do obu klientów (Multicast/Broadcast)
+ - [ ] Obsługa komunikatów
+ - [ ] Obsługa błędów
 
 #### Polecenie:
 <ul>
@@ -43,3 +47,4 @@ programistę (następujące po polu danych).</li>
  - [ASCII/HEX/BIN](https://www.asciitohex.com)
  - [Remove spaces](https://www.browserling.com/tools/remove-all-whitespace)
  - [U2 Converter](https://www.exploringbinary.com/twos-complement-converter/)
+ - [Core code - "Java Socket Progarmming Examples"](https://cs.lmu.edu/~ray/notes/javanetexamples/)
