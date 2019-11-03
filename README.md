@@ -3,17 +3,12 @@
 
 #### TODO:
  - [x] Konstrukcja nagłówka
-<<<<<<< HEAD
- - [ ] Forma konstruowania komunikatu przez klientów
- - [ ] Wysyłanie i odbieranie komunikatu
-=======
  - [x] Forma konstruowania komunikatu przez klientów
  - [x] Wysyłanie i odbieranie komunikatu
  - [ ] Wysyłanie przez serwer komunikatu do **wskazanego** klienta (Unicast)
  - [ ] Wysyłanie przez serwer komuniaktu do obu klientów (Multicast/Broadcast)
  - [ ] Obsługa komunikatów
  - [ ] Obsługa błędów
->>>>>>> header
 
 #### Polecenie:
 <ul>
