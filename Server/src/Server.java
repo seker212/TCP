@@ -1,11 +1,11 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -26,7 +26,7 @@ public class Server {
     private static Set<String> names = new HashSet<>();
 
      // The set of all the print writers for all the clients, used for broadcast.
-    private static Set<PrintWriter> writers = new HashSet<>();
+    private static Set<DataInputStream> writers = new HashSet<>();
 
     public static void main(String[] args) throws Exception {
         System.out.println("The chat server is running...");
@@ -67,12 +67,12 @@ public class Server {
                 in = new DataInputStream(socket.getInputStream());
                 out = new DataOutputStream(socket.getOutputStream());
                 header command = new header();
-                header test = new header((byte)0, true, "lol", (byte) 64);
+                byte sessionID = newSessionID();   
+
+                out.write(new header(0, 0, "", sessionID).getBinHeader());
                 
                 while (true) {
                     command.readHeader(in);
-                    command.printSystem();
-                    out.write(test.getBinHeader());
 
 
                     /*
@@ -88,14 +88,18 @@ public class Server {
                 if (name != null) {
                     System.out.println(name + " is leaving");
                     names.remove(name);
-                    for (PrintWriter writer : writers) {
-                        writer.println("MESSAGE " + name + " has left");
+                    for (var writer : writers) {
+                       // writer.println("MESSAGE " + name + " has left");
                     }
                 }
                 try { socket.close(); } catch (IOException e) {}
             }
         }
-        
+        private byte newSessionID(){
+            Random random = new Random();
+            byte rdsessionIDl =(byte) random.nextInt();
+            return rdsessionIDl;
+        }
             
         
         }

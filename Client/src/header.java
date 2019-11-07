@@ -6,7 +6,7 @@ import java.util.Collections;
 /**
  * header object
  * @param operationID - 4 bits, operation number, range form 0 to 15
- * @param Answer - 3 bits, '000' for client; '111' for server answer
+ * @param Answer - 3 bits, range form 0 to 7
  * @param dataLength 64 bits [8 bytes], length of data field in bytes
  * @param data - data in form of String
  * @param sessionID - 8 bits [1 byte], random for each client-server session
@@ -30,15 +30,14 @@ public class header {
     /**
      * Creastes a new header with given parameters
      * @param operationID operation number, range form 0 to 15
-     * @param answear 0 for client, 1 for server answear
+     * @param answear answer code, range form 0 to 7
      * @param data required;  mainly a String holding a message
      * @param sessionID reqiured; A random number given by a server for communication
      * @return header object
      */
-    public header(byte operationID, boolean answear, String data, byte sessionID){
+    public header(byte operationID, byte answear, String data, byte sessionID){
         int tmp_convert = operationID << 3;
-        if (answear)
-            tmp_convert += 0b111;
+        tmp_convert += answear;
         
         this._operationAndAnswer = (byte) tmp_convert;
         this._dataLength = data.length();
@@ -46,13 +45,12 @@ public class header {
         this._sessionID = sessionID;
     }
 
-    public header(int operationID, boolean answear, String data, int sessionID){
+    public header(int operationID, int answear, String data, int sessionID){
         byte opID_byte = (byte)operationID;
         byte sessionID_byte = (byte) sessionID;
         int tmp_convert = opID_byte << 3;
-        if (answear)
-            tmp_convert += 0b111;
-        
+        tmp_convert += answear;
+
         this._operationAndAnswer = (byte) tmp_convert;
         this._dataLength = data.length();
         this._data = data;
@@ -82,10 +80,19 @@ public class header {
 
     /**
      * Gets information about answer form header
-     * @return true for '111'; false for '000'
+     * @return int
      */
-    public boolean getAnswer(){
-        return ((_operationAndAnswer & 7) == 7);
+    public int getAnswer(){
+        int a = 0;
+        if ((_operationAndAnswer & 1) == 1)
+            a += 0b001;
+        if ((_operationAndAnswer & 2) == 2)
+            a += 0b010;
+        if ((_operationAndAnswer & 4) == 4)
+            a += 0b100;
+        
+        return a;
+        
     }
 
     /**
@@ -117,7 +124,7 @@ public class header {
      */
     public void printSystem(){
         System.out.println("Operation number: " + getOperationID());
-        System.out.println("Answer: " + (getAnswer()?"111":"000"));
+        System.out.println("Answer: " + getAnswer());
         System.out.println("Data length: " + _dataLength);
         System.out.println("Data: " + _data);
         System.out.println("Session identifier: " + _sessionID);
