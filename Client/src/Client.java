@@ -58,23 +58,23 @@ public class Client {
                 try {
                     if (textMsg.startsWith("\\"))
                     {
-                        if (textMsg.substring(1) == "sendinv")
+                        if (textMsg.substring(1).equals("sendinv"))
                         {
                             out.write(new header(3,0, "", _sessionID).getBinHeader());
                         }
-                        else if (textMsg.substring(1) == "accept")
+                        else if (textMsg.substring(1).equals("accept"))
                         {
                             out.write(new header(4,0, "", _sessionID).getBinHeader());
                         }
-                        else if (textMsg.substring(1) == "refuse")
+                        else if (textMsg.substring(1).equals("refuse"))
                         {
                             out.write(new header(5,0, "", _sessionID).getBinHeader());
                         }
-                        else if (textMsg.substring(1) == "leave")
+                        else if (textMsg.substring(1).equals("leave"))
                         {
                             out.write(new header(7,0, "", _sessionID).getBinHeader());
                         }
-                        else if (textMsg.substring(1) == "exit")
+                        else if (textMsg.substring(1).equals("exit"))
                         {
                             out.write(new header(8,0, "", _sessionID).getBinHeader());
                         }
@@ -121,7 +121,7 @@ public class Client {
                 if (answerHeader.getSessionID() == _sessionID){
                     if(answerHeader.getOperationID() == 2)
                     {
-                        if (answerHeader.getData() == _name){
+                        if (answerHeader.getData().equals(_name)){
                             if (answerHeader.getAnswer() == 1){
                                 this.frame.setTitle("Chat - " + _name);
                                 textField.setEditable(true);
@@ -144,7 +144,7 @@ public class Client {
                     }
                     else if(answerHeader.getOperationID() == 8)
                     {
-                        socket.close();  //TODO: Check is it works???
+                        try { socket.close(); } catch (Exception e) {}  //FIXME: java.net.SocketException: Socket closed
                     }
                     else if(answerHeader.getOperationID() == 9)
                     {

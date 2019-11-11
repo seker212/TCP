@@ -190,7 +190,7 @@ public class header {
             // save first bit of data String
             // if least significat bit of first byte is 1
             byte firstDataBit = 0;
-            if ((inputABytes.get(0).byteValue() & 1) == 1){
+            if ((inputABytes.get(8).byteValue() & 1) == 1){
                 firstDataBit = 1;
             }
             

@@ -10,22 +10,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * A multithreaded chat room server. When a client connects the server requests a screen
- * name by sending the client the text "SUBMITNAME", and keeps requesting a name until
- * a unique one is received. After a client submits a unique name, the server acknowledges
- * with "NAMEACCEPTED". Then all messages from that client will be broadcast to all other
- * clients that have submitted a unique screen name. The broadcast messages are prefixed
- * with "MESSAGE".
+ * A multithreaded chat room server. When a client connects the server requests
+ * a screen name by sending the client the text "SUBMITNAME", and keeps
+ * requesting a name until a unique one is received. After a client submits a
+ * unique name, the server acknowledges with "NAMEACCEPTED". Then all messages
+ * from that client will be broadcast to all other clients that have submitted a
+ * unique screen name. The broadcast messages are prefixed with "MESSAGE".
  *
- * This is just a teaching example so it can be enhanced in many ways, e.g., better
- * logging. Another is to accept a lot of fun commands, like Slack.
+ * This is just a teaching example so it can be enhanced in many ways, e.g.,
+ * better logging. Another is to accept a lot of fun commands, like Slack.
  */
 public class Server {
 
     // All client names, so we can check for duplicates upon registration.
     private static Set<String> names = new HashSet<>();
 
-     // The set of all the print writers for all the clients, used for broadcast.
+    // The set of all the print writers for all the clients, used for broadcast.
     private static clientList openClients = new clientList();
     private static clientList room = new clientList();
 
@@ -48,8 +48,7 @@ public class Server {
         private DataInputStream in;
         private DataOutputStream out;
         int clientListNR = -1;
-        // byte sessionID = newSessionID();
-        byte sessionID = 127;
+        byte sessionID = newSessionID();
 
         /**
          * Constructs a handler thread, squirreling away the socket. All the interesting
@@ -60,11 +59,12 @@ public class Server {
             this.socket = socket;
         }
 
-        private byte newSessionID(){
+        private byte newSessionID() {
             Random random = new Random();
             byte rdsessionID = (byte) random.nextInt();
             return rdsessionID;
         }
+
         /**
          * Services this thread's client by repeatedly requesting a screen name until a
          * unique one has been submitted, then acknowledges the name and registers the
@@ -76,115 +76,108 @@ public class Server {
                 in = new DataInputStream(socket.getInputStream());
                 out = new DataOutputStream(socket.getOutputStream());
                 header command = new header();
-                   
-                
+
                 while (true) {
                     command.readHeader(in);
+                    // command.printSystem();
 
-                    if (command.getOperationID() == 1)
-                    {
+                    if (command.getOperationID() == 1) {
                         out.write(new header(1, 1, "", sessionID).getBinHeader());
-                        if (clientListNR == -1){
+                        if (clientListNR == -1) {
                             clientListNR = openClients.add(new clientOut(out, "", sessionID));
-                        }else if (clientListNR == 0 || clientListNR == 1){
+                        } else if (clientListNR == 0 || clientListNR == 1) {
                             openClients.replace(clientListNR, new clientOut(out, "", sessionID));
                         }
                     }
-                    if (command.getSessionID() == sessionID){
-                        if (command.getOperationID() == 2)
-                        {
-                            if(names.contains(command.getData())){
+                    if (command.getSessionID() == sessionID) {
+                        if (command.getOperationID() == 2) {
+                            if (names.contains(command.getData())) {
                                 out.write(new header(2, 2, command.getData(), sessionID).getBinHeader());
-                            }else{
+                            } else {
                                 name = command.getData();
                                 names.add(name);
                                 openClients.replace(clientListNR, new clientOut(out, name, sessionID));
                                 out.write(new header(2, 1, name, sessionID).getBinHeader());
+                                if (openClients.isActive())
+                                    out.write(new header(9,0,"Client is available",sessionID).getBinHeader());
                             }
-                        }
-                        else if (command.getOperationID() == 3)
-                        {
-                            if (openClients.isActive()){
+                        } else if (command.getOperationID() == 3) {
+                            if (openClients.isActive()) {
                                 int otherI = -1;
                                 if (clientListNR == 0)
                                     otherI = 1;
                                 else if (clientListNR == 1)
                                     otherI = 0;
 
-                                openClients.get(otherI)._out.write(new header(9, 0, name + " has sent you an invitation", openClients.get(otherI)._sessionID).getBinHeader());
-                            }else{
+                                openClients.get(otherI)._out
+                                        .write(new header(9, 0, name + " has sent you an invitation", openClients.get(otherI)._sessionID).getBinHeader());
+                            } else {
                                 out.write(new header(3, 3, "", sessionID).getBinHeader());
                             }
-                        }
-                        else if (command.getOperationID() == 4)
-                        {
-                            //TODO: send 'header(3,1,"",sessionID)'?
-
-                            if (openClients.isActive()){
-                                room = openClients;
+                        } else if (command.getOperationID() == 4) {
+                            // TODO: send 'header(3,1,"",sessionID)'?
+                            // FIXME: Check if the client got an inv
+                            if (openClients.isActive()) {
+                                room = new clientList(openClients);
                                 room.get(0)._out.write(new header(9, 0, room.get(1).getName() + " has joined the room", room.get(0).getSessionID()).getBinHeader());
                                 room.get(1)._out.write(new header(9, 0, room.get(0).getName() + " has joined the room", room.get(1).getSessionID()).getBinHeader());
-                            }else{
+                            } else {
                                 out.write(new header(3, 3, "", sessionID).getBinHeader());
                             }
-                        }
-                        else if (command.getOperationID() == 5)
-                        {
-                            if (openClients.isActive()){
-                                int otherI = -1;
-                                    if (clientListNR == 0)
-                                        otherI = 1;
-                                    else if (clientListNR == 1)
-                                        otherI = 0;
-                                openClients.get(otherI)._out.write(new header(3, 2, "", openClients.get(otherI)._sessionID).getBinHeader());
-                            }else{
-                                out.write(new header(3, 3, "", sessionID).getBinHeader());
-                            }
-                        }
-                        else if (command.getOperationID() == 6)
-                        {
-                            if (room.isActive()){
-                                room.get(0)._out.write(new header(9, 0, name + ": " + command.getData(), room.get(0).getSessionID()).getBinHeader());
-                                room.get(1)._out.write(new header(9, 0, name + ": " + command.getData(), room.get(1).getSessionID()).getBinHeader());
-                            }else{
-                                out.write(new header(9, 0, name + ": " + command.getData(), sessionID).getBinHeader());
-                            }
-                        }
-                        else if (command.getOperationID() == 7)
-                        {
-                            room.reset();
-                            if(openClients.isActive()){
+                        } else if (command.getOperationID() == 5) {
+                            if (openClients.isActive()) {
                                 int otherI = -1;
                                 if (clientListNR == 0)
                                     otherI = 1;
                                 else if (clientListNR == 1)
                                     otherI = 0;
+                                openClients.get(otherI)._out.write(new header(3, 2, "", openClients.get(otherI)._sessionID).getBinHeader());
+                            } else {
+                                out.write(new header(3, 3, "", sessionID).getBinHeader());
+                            }
+                        } else if (command.getOperationID() == 6) {
+                            if (room.isActive()) {
+                                room.get(0)._out.write(
+                                        new header(9, 0, name + ": " + command.getData(), room.get(0).getSessionID()).getBinHeader());
+                                room.get(1)._out.write(
+                                        new header(9, 0, name + ": " + command.getData(), room.get(1).getSessionID()).getBinHeader());
+                            } else {
+                                out.write(new header(9, 0, name + ": " + command.getData(), sessionID).getBinHeader());
+                            }
+                        } else if (command.getOperationID() == 7) {
+                            if (room.isActive()) {
+                                int otherI = -1;
+                                if (clientListNR == 0)
+                                otherI = 1;
+                                else if (clientListNR == 1)
+                                otherI = 0;
                                 openClients.get(otherI)._out.write(new header(9, 0, name + " has left the room", openClients.get(otherI)._sessionID).getBinHeader());
                             }
-                            out.write(new header(9,0,"You have left the room", sessionID).getBinHeader());
-                        }
-                        else if (command.getOperationID() == 8)
-                        {
-                            if (room.isActive()){
+                            room.reset();
+                            out.write(new header(9, 0, "You have left the room", sessionID).getBinHeader());
+                        } else if (command.getOperationID() == 8) {
+                            if (room.isActive()) {
                                 room.reset();
-                                if(openClients.isActive()){
+                                if (openClients.isActive()) {
                                     int otherI = -1;
                                     if (clientListNR == 0)
                                         otherI = 1;
                                     else if (clientListNR == 1)
                                         otherI = 0;
-                                    openClients.get(otherI)._out.write(new header(9, 0, name + " has left the room", sessionID).getBinHeader());
+                                    openClients.get(otherI)._out.write(
+                                            new header(9, 0, name + " has left the room", sessionID).getBinHeader());
                                 }
-                                out.write(new header(9,0,"You have left the room", sessionID).getBinHeader());
+                                out.write(new header(9, 0, "You have left the room", sessionID).getBinHeader());
                             }
                             openClients.remove(clientListNR);
-                            out.write(new header(8,1,"",sessionID).getBinHeader());
+                            out.write(new header(8, 1, "", sessionID).getBinHeader());
                         }
                     }
 
                 }
             } catch (Exception e) {
-                System.out.println(e);
+                // TODO: handle exception
+                // System.out.println(e);
             } finally {
                 if (out != null) {
                     if (room.isActive())
@@ -194,14 +187,19 @@ public class Server {
                 if (name != null) {
                     System.out.println(name + " is leaving");
                     names.remove(name);
-                    /* if(openClients.isActive()){
+                    if (openClients.isActive()) {
                         int otherI = -1;
                         if (clientListNR == 0)
                             otherI = 1;
                         else if (clientListNR == 1)
                             otherI = 0;
-                        openClients.get(otherI)._out.write(new header(9, 0, name + " has left the room", openClients.get(otherI)._sessionID).getBinHeader());
-                    } */
+                        try {
+                            openClients.get(otherI)._out.write(new header(9, 0, name + " has left the room", openClients.get(otherI)._sessionID).getBinHeader());
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
                 }
                 try { socket.close(); } catch (IOException e) {}
             }
@@ -213,21 +211,27 @@ public class Server {
     private static class clientList{
         private clientOut[] cList;
         private boolean[] checktable; 
-        private int clientNumber;
+        // private int clientNumber;
 
         public clientList(){
             this.cList = new clientOut[2];
             this.checktable = new boolean[]{false, false};//false == empty; true == taken
-            this.clientNumber = 0;
+            // this.clientNumber = 0;
         }
 
-        public boolean isEmpty(){
+        public clientList(clientList e){
+            this.cList = e.cList.clone();
+            this.checktable = e.checktable.clone();//false == empty; true == taken
+            // this.clientNumber = e.clientNumber;
+        }
+
+        /* public boolean isEmpty(){
             return clientNumber == 0;
         }
 
         public int size(){
             return clientNumber;
-        }
+        } */
 
         public int add(clientOut cOut){
             for (int i = 0; i < 2; i++) {
@@ -269,9 +273,9 @@ public class Server {
             return cList[index];
         }
 
-        public clientOut[] getList(){
+       /*  public clientOut[] getList(){
             return cList;
-        }
+        } */
 
         public boolean isActive(){
             return checktable[0] && checktable[1];
@@ -295,12 +299,14 @@ public class Server {
         public String getName() {
             return _name;
         }
+
         /**
          * @return the _out
          */
-        public DataOutputStream getOut() {
+        /* public DataOutputStream getOut() {
             return _out;
-        }
+        } */
+
         /**
          * @return the _sessionID
          */
