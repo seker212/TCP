@@ -58,33 +58,29 @@ public class Client {
                 try {
                     if (textMsg.startsWith("\\"))
                     {
-                        if (textMsg.substring(1) == "search")
+                        if (textMsg.substring(1) == "sendinv")
                         {
-                            out.write(new header(3,false, "", _sessionID).getBinHeader());
-                        }
-                        else if (textMsg.substring(1, 9) == "sendinv ")
-                        {
-                            out.write(new header(5,false, textMsg.substring(9), _sessionID).getBinHeader());
+                            out.write(new header(3,0, "", _sessionID).getBinHeader());
                         }
                         else if (textMsg.substring(1) == "accept")
                         {
-                            out.write(new header(7,false, "", _sessionID).getBinHeader());
+                            out.write(new header(4,0, "", _sessionID).getBinHeader());
                         }
                         else if (textMsg.substring(1) == "refuse")
                         {
-                            out.write(new header(8,false, "", _sessionID).getBinHeader());
+                            out.write(new header(5,0, "", _sessionID).getBinHeader());
                         }
                         else if (textMsg.substring(1) == "leave")
                         {
-                            out.write(new header(13,false, "", _sessionID).getBinHeader());
+                            out.write(new header(7,0, "", _sessionID).getBinHeader());
                         }
                         else if (textMsg.substring(1) == "exit")
                         {
-                            out.write(new header(14,false, "", _sessionID).getBinHeader());
+                            out.write(new header(8,0, "", _sessionID).getBinHeader());
                         }
                     }else
                     {
-                        out.write(new header(11, false, textMsg, _sessionID).getBinHeader());
+                        out.write(new header(6, 0, textMsg, _sessionID).getBinHeader());
                     }
                 } catch (Exception f) {
                     //TODO: handle exception
@@ -94,11 +90,11 @@ public class Client {
         });
     }
 
-    private String getName() {
+    private String getName(String textString) {
         return JOptionPane.showInputDialog(
             frame,
-            "Choose a screen name:",
-            "Screen name selection",
+            "Client name selection",
+            textString,
             JOptionPane.PLAIN_MESSAGE
         );
     }
@@ -108,88 +104,57 @@ public class Client {
             Socket socket = new Socket(serverAddress, 59001);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
-            header command = new header();
+            header answerHeader = new header();
+            
+            if (socket.isConnected())
+                out.write(new header(1, 0, "", 0).getBinHeader());
 
-            while (command.readHeader(in)) {
-                //TODO: Command handling
+            while (answerHeader.readHeader(in)) {
 
-                if (command.getOperationID() == 0){
-                    _sessionID = command.getSessionID();
-                    _name = getName();
-                    out.write(new header(1, false, _name, _sessionID).getBinHeader());
+                if (answerHeader.getOperationID() == 1 && answerHeader.getSessionID() != _sessionID){
+                    _sessionID = answerHeader.getSessionID();
+                    if (_name.isEmpty()){
+                        _name = getName("Write your name");
+                        out.write(new header(2, 0, _name, _sessionID).getBinHeader());
+                    }
                 }
-                if (command.getSessionID() == _sessionID){
-                    if(command.getOperationID() == 1)
+                if (answerHeader.getSessionID() == _sessionID){
+                    if(answerHeader.getOperationID() == 2)
                     {
-                        if (command.getAnswer() && command.getData() == _name){
-                            this.frame.setTitle("Chat - " + _name);
-                            textField.setEditable(true);
-                        }else if(!command.getAnswer() && command.getData() == _name)/* name taken */{
-                            _name = getName();
-                            out.write(new header(1, false, _name, _sessionID).getBinHeader());
+                        if (answerHeader.getData() == _name){
+                            if (answerHeader.getAnswer() == 1){
+                                this.frame.setTitle("Chat - " + _name);
+                                textField.setEditable(true);
+                            }else if(answerHeader.getAnswer() == 2){
+                                _name = getName("Name taken. Please try another one");
+                                out.write(new header(1, 0, _name, _sessionID).getBinHeader());
+                            }
+
                         }
                     }
-                    else if(command.getOperationID() == 2)
+                    else if(answerHeader.getOperationID() == 3)
                     {
-    
+                        if (answerHeader.getAnswer() == 1){
+                            //TODO: Should here be sth?
+                        }else if(answerHeader.getAnswer() == 2){
+                            messageArea.append("Invitation refused" + "\n");
+                        }else if(answerHeader.getAnswer() == 3){
+                            messageArea.append("ERROR: No reachable client" + "\n");
+                        }
                     }
-                    else if(command.getOperationID() == 3)
+                    else if(answerHeader.getOperationID() == 8)
                     {
-                        
+                        socket.close();  //TODO: Check is it works???
                     }
-                    else if(command.getOperationID() == 4)
+                    else if(answerHeader.getOperationID() == 9)
                     {
-    
-                    }
-                    else if(command.getOperationID() == 5)
-                    {
-    
-                    }
-                    else if(command.getOperationID() == 6)
-                    {
-    
-                    }
-                    else if(command.getOperationID() == 7)
-                    {
-    
-                    }
-                    else if(command.getOperationID() == 8)
-                    {
-    
-                    }
-                    else if(command.getOperationID() == 9)
-                    {
-    
-                    }
-                    else if(command.getOperationID() == 10)
-                    {
-    
-                    }
-                    else if(command.getOperationID() == 11)
-                    {
-    
-                    }
-                    else if(command.getOperationID() == 12)
-                    {
-    
-                    }
-                    else if(command.getOperationID() == 13)
-                    {
-    
-                    }
-                    else if(command.getOperationID() == 14)
-                    {
-                        // socket.close();
-    
-                    }
-                    else if(command.getOperationID() == 15)
-                    {
+                        messageArea.append(answerHeader.getData() + "\n");
                     }
 
+                }else{
+                    out.write(new header(1, 0, "", 0).getBinHeader());
                 }
                 
-
-
             }
         } finally {
             frame.setVisible(false);
