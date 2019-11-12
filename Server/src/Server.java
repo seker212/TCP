@@ -105,10 +105,14 @@ public class Server {
                             }
                         } else if (command.getOperationID() == 3) {
                             if (openClients.isActive()) {
-                                int otherI = other(clientListNR);
-
-                                invitationSet.add(openClients.get(otherI));
-                                openClients.get(otherI)._out.write(new header(9, 0, name + " has sent you an invitation", openClients.get(otherI)._sessionID).getBinHeader());
+                                if (!room.isActive()){
+                                    int otherI = other(clientListNR);
+    
+                                    invitationSet.add(openClients.get(otherI));
+                                    openClients.get(otherI)._out.write(new header(9, 0, name + " has sent you an invitation", openClients.get(otherI)._sessionID).getBinHeader());
+                                }else{
+                                    out.write(new header(3,4,"",sessionID).getBinHeader());
+                                }
                                 
                             } else {
                                 out.write(new header(3, 3, "", sessionID).getBinHeader());
@@ -116,28 +120,35 @@ public class Server {
                         } else if (command.getOperationID() == 4) {
                             // TODO: send 'header(3,1,"",sessionID)'?
                             if (openClients.isActive()) {
-                                if (invitationSet.contains(openClients.get(clientListNR))){
-                                    room = new clientList(openClients);
-                                    room.get(0)._out.write(new header(9, 0, room.get(1).getName() + " has joined the room", room.get(0).getSessionID()).getBinHeader());
-                                    room.get(1)._out.write(new header(9, 0, room.get(0).getName() + " has joined the room", room.get(1).getSessionID()).getBinHeader());
-                                    invitationSet.remove(openClients.get(clientListNR));
+                                if(!room.isActive()){
+                                    if (invitationSet.contains(openClients.get(clientListNR))){
+                                        room = new clientList(openClients);
+                                        room.get(0)._out.write(new header(9, 0, room.get(1).getName() + " has joined the room", room.get(0).getSessionID()).getBinHeader());
+                                        room.get(1)._out.write(new header(9, 0, room.get(0).getName() + " has joined the room", room.get(1).getSessionID()).getBinHeader());
+                                        invitationSet.clear();
+                                    }else{
+                                        out.write(new header(9,0, "You don't have any invitation", sessionID).getBinHeader());
+                                    }
                                 }else{
-                                    out.write(new header(9,0, "You don't have any invitation", sessionID).getBinHeader());
+                                    out.write(new header(3,4,"",sessionID).getBinHeader());
                                 }
-
+                                
                             } else {
                                 out.write(new header(3, 3, "", sessionID).getBinHeader());
                             }
                         } else if (command.getOperationID() == 5) {
                             if (openClients.isActive()) {
-                                int otherI = other(clientListNR);
-                                if (invitationSet.contains(openClients.get(clientListNR))){
-                                    openClients.get(otherI)._out.write(new header(3, 2, "", openClients.get(otherI)._sessionID).getBinHeader());
-                                    invitationSet.remove(openClients.get(clientListNR));
+                                if (!room.isActive()){
+                                    int otherI = other(clientListNR);
+                                    if (invitationSet.contains(openClients.get(clientListNR))){
+                                        openClients.get(otherI)._out.write(new header(3, 2, "", openClients.get(otherI)._sessionID).getBinHeader());
+                                        invitationSet.remove(openClients.get(clientListNR));
+                                    }else{
+                                        out.write(new header(9,0, "You don't have any invitation", sessionID).getBinHeader());
+                                    }
                                 }else{
-                                    out.write(new header(9,0, "You don't have any invitation", sessionID).getBinHeader());
+                                    out.write(new header(3,4,"",sessionID).getBinHeader());
                                 }
-
                             } else {
                                 out.write(new header(3, 3, "", sessionID).getBinHeader());
                             }

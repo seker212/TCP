@@ -142,6 +142,8 @@ public class Client {
                             messageArea.append("Invitation refused" + "\n");
                         }else if(answerHeader.getAnswer() == 3){
                             messageArea.append("ERROR: No reachable client" + "\n");
+                        }else if(answerHeader.getAnswer() == 4){
+                            messageArea.append("ERROR: You are already in the room\n");
                         }
                     }
                     else if(answerHeader.getOperationID() == 8)
