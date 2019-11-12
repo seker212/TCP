@@ -11,7 +11,7 @@ ID (dec) | ID (hex) | ID (bin) | Description | data field (String) | Sender | Co
 6 | 6 | 0110 | send message | `message` | Client | _none_
 7 | 7 | 0111 | leave room | _none_ | Client | `\leave`
 8 | 8 | 1000 | disconnect | _none_ | Client | `\exit`
-9 | 9 | 1001 | broadcast message | `name`: `message` | Server | _none_
+9 | 9 | 1001 | print message | `name`: `message`/`server message` | Server | _none_
 10 | 10 | 1010 | ERROR | `error code` | Client, Server | _none_
 
 
