@@ -29,6 +29,8 @@ public class Server {
     private static clientList openClients = new clientList();
     private static clientList room = new clientList();
 
+    private static Set<clientOut> invitationSet = new HashSet<>();
+
     public static void main(String[] args) throws Exception {
         System.out.println("The chat server is running...");
         ExecutorService pool = Executors.newFixedThreadPool(2);
@@ -103,35 +105,39 @@ public class Server {
                             }
                         } else if (command.getOperationID() == 3) {
                             if (openClients.isActive()) {
-                                int otherI = -1;
-                                if (clientListNR == 0)
-                                    otherI = 1;
-                                else if (clientListNR == 1)
-                                    otherI = 0;
+                                int otherI = other(clientListNR);
 
-                                openClients.get(otherI)._out
-                                        .write(new header(9, 0, name + " has sent you an invitation", openClients.get(otherI)._sessionID).getBinHeader());
+                                invitationSet.add(openClients.get(otherI));
+                                openClients.get(otherI)._out.write(new header(9, 0, name + " has sent you an invitation", openClients.get(otherI)._sessionID).getBinHeader());
+                                
                             } else {
                                 out.write(new header(3, 3, "", sessionID).getBinHeader());
                             }
                         } else if (command.getOperationID() == 4) {
                             // TODO: send 'header(3,1,"",sessionID)'?
-                            // FIXME: Check if the client got an inv
                             if (openClients.isActive()) {
-                                room = new clientList(openClients);
-                                room.get(0)._out.write(new header(9, 0, room.get(1).getName() + " has joined the room", room.get(0).getSessionID()).getBinHeader());
-                                room.get(1)._out.write(new header(9, 0, room.get(0).getName() + " has joined the room", room.get(1).getSessionID()).getBinHeader());
+                                if (invitationSet.contains(openClients.get(clientListNR))){
+                                    room = new clientList(openClients);
+                                    room.get(0)._out.write(new header(9, 0, room.get(1).getName() + " has joined the room", room.get(0).getSessionID()).getBinHeader());
+                                    room.get(1)._out.write(new header(9, 0, room.get(0).getName() + " has joined the room", room.get(1).getSessionID()).getBinHeader());
+                                    invitationSet.remove(openClients.get(clientListNR));
+                                }else{
+                                    out.write(new header(9,0, "You don't have any invitation", sessionID).getBinHeader());
+                                }
+
                             } else {
                                 out.write(new header(3, 3, "", sessionID).getBinHeader());
                             }
                         } else if (command.getOperationID() == 5) {
                             if (openClients.isActive()) {
-                                int otherI = -1;
-                                if (clientListNR == 0)
-                                    otherI = 1;
-                                else if (clientListNR == 1)
-                                    otherI = 0;
-                                openClients.get(otherI)._out.write(new header(3, 2, "", openClients.get(otherI)._sessionID).getBinHeader());
+                                int otherI = other(clientListNR);
+                                if (invitationSet.contains(openClients.get(clientListNR))){
+                                    openClients.get(otherI)._out.write(new header(3, 2, "", openClients.get(otherI)._sessionID).getBinHeader());
+                                    invitationSet.remove(openClients.get(clientListNR));
+                                }else{
+                                    out.write(new header(9,0, "You don't have any invitation", sessionID).getBinHeader());
+                                }
+
                             } else {
                                 out.write(new header(3, 3, "", sessionID).getBinHeader());
                             }
@@ -146,11 +152,7 @@ public class Server {
                             }
                         } else if (command.getOperationID() == 7) {
                             if (room.isActive()) {
-                                int otherI = -1;
-                                if (clientListNR == 0)
-                                otherI = 1;
-                                else if (clientListNR == 1)
-                                otherI = 0;
+                                int otherI = other(clientListNR);
                                 openClients.get(otherI)._out.write(new header(9, 0, name + " has left the room", openClients.get(otherI)._sessionID).getBinHeader());
                             }
                             room.reset();
@@ -159,11 +161,7 @@ public class Server {
                             if (room.isActive()) {
                                 room.reset();
                                 if (openClients.isActive()) {
-                                    int otherI = -1;
-                                    if (clientListNR == 0)
-                                        otherI = 1;
-                                    else if (clientListNR == 1)
-                                        otherI = 0;
+                                    int otherI = other(clientListNR);
                                     openClients.get(otherI)._out.write(
                                             new header(9, 0, name + " has left the room", sessionID).getBinHeader());
                                 }
@@ -176,23 +174,21 @@ public class Server {
 
                 }
             } catch (Exception e) {
-                // TODO: handle exception
+                // TODO Handle exception
                 // System.out.println(e);
             } finally {
                 if (out != null) {
                     if (room.isActive())
                         room.reset();
+                    if (invitationSet.contains(openClients.get(clientListNR)))
+                        invitationSet.remove(openClients.get(clientListNR));
                     openClients.remove(clientListNR);
                 }
                 if (name != null) {
                     System.out.println(name + " is leaving");
                     names.remove(name);
                     if (openClients.isActive()) {
-                        int otherI = -1;
-                        if (clientListNR == 0)
-                            otherI = 1;
-                        else if (clientListNR == 1)
-                            otherI = 0;
+                        int otherI = other(clientListNR);
                         try {
                             openClients.get(otherI)._out.write(new header(9, 0, name + " has left the room", openClients.get(otherI)._sessionID).getBinHeader());
                         } catch (Exception e) {
@@ -206,6 +202,15 @@ public class Server {
         }
             
         
+        }
+
+        public static int other(int i){
+            if (i == 0)
+                return 1;
+            else if (i == 1)
+                return 0;
+            else
+                return -1;
         }
 
     private static class clientList{
@@ -245,7 +250,7 @@ public class Server {
                             }else if (i == 1)
                                 cList[0]._out.write(new header(9, 0, "Client " + cOut._name + " is available", cList[0]._sessionID).getBinHeader());
                         } catch (Exception e) {
-                            //TODO: handle exception
+                            //TODO Handle exception
                         }
                     }
                     return i;

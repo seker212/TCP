@@ -77,6 +77,8 @@ public class Client {
                         else if (textMsg.substring(1).equals("exit"))
                         {
                             out.write(new header(8,0, "", _sessionID).getBinHeader());
+                        }else{
+                            messageArea.append("Command " + textMsg.substring(1) + " not found\n");
                         }
                     }else
                     {
@@ -93,8 +95,8 @@ public class Client {
     private String getName(String textString) {
         return JOptionPane.showInputDialog(
             frame,
-            "Client name selection",
             textString,
+            "Client name selection",
             JOptionPane.PLAIN_MESSAGE
         );
     }
@@ -127,7 +129,7 @@ public class Client {
                                 textField.setEditable(true);
                             }else if(answerHeader.getAnswer() == 2){
                                 _name = getName("Name taken. Please try another one");
-                                out.write(new header(1, 0, _name, _sessionID).getBinHeader());
+                                out.write(new header(2, 0, _name, _sessionID).getBinHeader());
                             }
 
                         }
