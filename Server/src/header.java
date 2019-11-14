@@ -30,14 +30,14 @@ public class header {
     /**
      * Creastes a new header with given parameters
      * @param operationID operation number, range form 0 to 15
-     * @param answear answer code, range form 0 to 7
+     * @param answer answer code, range form 0 to 7
      * @param data required;  mainly a String holding a message
      * @param sessionID reqiured; A random number given by a server for communication
      * @return header object
      */
-    public header(byte operationID, byte answear, String data, byte sessionID){
+    public header(byte operationID, byte answer, String data, byte sessionID){
         int tmp_convert = operationID << 3;
-        tmp_convert += answear;
+        tmp_convert += answer;
         
         this._operationAndAnswer = (byte) tmp_convert;
         this._dataLength = data.length();
@@ -45,11 +45,11 @@ public class header {
         this._sessionID = sessionID;
     }
 
-    public header(int operationID, int answear, String data, int sessionID){
+    public header(int operationID, int answer, String data, int sessionID){
         byte opID_byte = (byte)operationID;
         byte sessionID_byte = (byte) sessionID;
         int tmp_convert = opID_byte << 3;
-        tmp_convert += answear;
+        tmp_convert += answer;
 
         this._operationAndAnswer = (byte) tmp_convert;
         this._dataLength = data.length();
