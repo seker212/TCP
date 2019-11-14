@@ -150,6 +150,16 @@ public class Client {
                             messageArea.append("ERROR: No reachable client" + "\n");
                         }else if(answerHeader.getAnswer() == 4){
                             messageArea.append("ERROR: You are already in the room\n");
+                        }else if(answerHeader.getAnswer() == 5){
+                            messageArea.append(answerHeader.getData() + "\n");
+                        }else if(answerHeader.getAnswer() == 6){
+                            messageArea.append(answerHeader.getData() + "\n");
+                        }
+                    }
+                    else if(answerHeader.getOperationID() == 7)
+                    {
+                        if (answerHeader.getAnswer() == 1){
+                            messageArea.append(answerHeader.getData() + "\n");
                         }
                     }
                     else if(answerHeader.getOperationID() == 8)
@@ -157,6 +167,10 @@ public class Client {
                         try { socket.close(); } catch (Exception e) {}  //FIXME: java.net.SocketException: Socket closed
                     }
                     else if(answerHeader.getOperationID() == 9)
+                    {
+                        messageArea.append(answerHeader.getData() + "\n");
+                    }
+                    else if(answerHeader.getOperationID() == 10)
                     {
                         messageArea.append(answerHeader.getData() + "\n");
                     }

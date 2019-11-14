@@ -114,7 +114,7 @@ public class Server {
                                 openClients.replace(clientListNR, new clientOut(out, name, sessionID));
                                 out.write(new header(2, 1, name, sessionID).getBinHeader());
                                 if (openClients.isActive())
-                                    out.write(new header(9,0,"Client is available",sessionID).getBinHeader()); //TODO: change opID [10]
+                                    out.write(new header(10,0,"Client is available",sessionID).getBinHeader());
                             }
                         } else if (command.getOperationID() == 3) {
                             if (openClients.isActive()) {
@@ -122,7 +122,7 @@ public class Server {
                                     int otherI = other(clientListNR);
     
                                     invitationSet.add(openClients.get(otherI));
-                                    openClients.get(otherI)._out.write(new header(9, 0, name + " has sent you an invitation", openClients.get(otherI)._sessionID).getBinHeader());//TODO: change opID [3,5]
+                                    openClients.get(otherI)._out.write(new header(3, 5, name + " has sent you an invitation", openClients.get(otherI)._sessionID).getBinHeader());
                                 }else{
                                     out.write(new header(3,4,"",sessionID).getBinHeader());
                                 }
@@ -136,11 +136,11 @@ public class Server {
                                 if(!room.isActive()){
                                     if (invitationSet.contains(openClients.get(clientListNR))){
                                         room = new clientList(openClients);
-                                        room.get(0)._out.write(new header(9, 0, room.get(1).getName() + " has joined the room", room.get(0).getSessionID()).getBinHeader());//TODO: change opID [10]
-                                        room.get(1)._out.write(new header(9, 0, room.get(0).getName() + " has joined the room", room.get(1).getSessionID()).getBinHeader());//TODO: change opID [10]
+                                        room.get(0)._out.write(new header(10, 0, room.get(1).getName() + " has joined the room", room.get(0).getSessionID()).getBinHeader());
+                                        room.get(1)._out.write(new header(10, 0, room.get(0).getName() + " has joined the room", room.get(1).getSessionID()).getBinHeader());
                                         invitationSet.clear();
                                     }else{
-                                        out.write(new header(9,0, "You don't have any invitation", sessionID).getBinHeader());//TODO: change opID [3,6]|[10]
+                                        out.write(new header(3, 6, "You don't have any invitation", sessionID).getBinHeader());
                                     }
                                 }else{
                                     out.write(new header(3,4,"",sessionID).getBinHeader());
@@ -157,7 +157,7 @@ public class Server {
                                         openClients.get(otherI)._out.write(new header(3, 2, "", openClients.get(otherI)._sessionID).getBinHeader());
                                         invitationSet.remove(openClients.get(clientListNR));
                                     }else{
-                                        out.write(new header(9,0, "You don't have any invitation", sessionID).getBinHeader());//TODO: change opID [3,6]|[10]
+                                        out.write(new header(3, 6, "You don't have any invitation", sessionID).getBinHeader());
                                     }
                                 }else{
                                     out.write(new header(3,4,"",sessionID).getBinHeader());
@@ -177,19 +177,19 @@ public class Server {
                         } else if (command.getOperationID() == 7) {
                             if (room.isActive()) {
                                 int otherI = other(clientListNR);
-                                openClients.get(otherI)._out.write(new header(9, 0, name + " has left the room", openClients.get(otherI)._sessionID).getBinHeader());//TODO: change opID [10]
+                                openClients.get(otherI)._out.write(new header(10, 0, name + " has left the room", openClients.get(otherI)._sessionID).getBinHeader());
                             }
                             room.reset();
-                            out.write(new header(9, 0, "You have left the room", sessionID).getBinHeader());//TODO: change opID [7,1]
+                            out.write(new header(7, 1, "You have left the room", sessionID).getBinHeader());
                         } else if (command.getOperationID() == 8) {
                             if (room.isActive()) {
                                 room.reset();
                                 if (openClients.isActive()) {
                                     int otherI = other(clientListNR);
                                     openClients.get(otherI)._out.write(
-                                            new header(9, 0, name + " has left the room", sessionID).getBinHeader());//TODO: change opID [10]
+                                            new header(10, 0, name + " has left the room", sessionID).getBinHeader());
                                 }
-                                out.write(new header(9, 0, "You have left the room", sessionID).getBinHeader());//TODO: change opID [7,1]
+                                out.write(new header(7, 1, "You have left the room", sessionID).getBinHeader());
                             }
                             openClients.remove(clientListNR);
                             out.write(new header(8, 1, "", sessionID).getBinHeader());
@@ -214,7 +214,7 @@ public class Server {
                     if (openClients.isActive()) {
                         int otherI = other(clientListNR);
                         try {
-                            openClients.get(otherI)._out.write(new header(9, 0, name + " has left the room", openClients.get(otherI)._sessionID).getBinHeader());//TODO: change opID [10]
+                            openClients.get(otherI)._out.write(new header(10, 0, name + " has left the room", openClients.get(otherI)._sessionID).getBinHeader());
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
