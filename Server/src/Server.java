@@ -87,19 +87,22 @@ public class Server {
                     // command.printSystem();
 
                     if (command.getOperationID() == 1) {
-                        try {
+                        if (!openClients.isActive()){
                             out.write(new header(1, 1, "", sessionID).getBinHeader());
                             if (clientListNR == -1) {
                                 clientListNR = openClients.add(new clientOut(out, "", sessionID));
                             } else if (clientListNR == 0 || clientListNR == 1) {
                                 openClients.replace(clientListNR, new clientOut(out, "", sessionID));
                             }
-                            
-                        } catch (Exception e) {
-                            out.write(new header(15, 0, "",0).getBinHeader());
+                        }else{
+                            if (clientListNR == 0 || clientListNR == 1) {
+                                out.write(new header(1, 1, "", sessionID).getBinHeader());
+                                openClients.replace(clientListNR, new clientOut(out, "", sessionID));
+                            } else{
+                                out.write(new header(15,0,"",0).getBinHeader());
+                            }
                         }
-                        
-                        
+
                     }
                     if (command.getSessionID() == sessionID) {
                         if (command.getOperationID() == 2) {

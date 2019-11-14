@@ -110,15 +110,16 @@ public class Client {
             
             if (socket.isConnected())
                 out.write(new header(1, 0, "", 0).getBinHeader());
-            else{
-               // messageArea.append("No free socket for new client. Reset application and try again");
-            }
 
             while (answerHeader.readHeader(in)) {
 
+                if(answerHeader.getOperationID() == 15){
+                    messageArea.append("Too many clients ona a server. Try again later");
+                }
+
                 if (answerHeader.getOperationID() == 1 && answerHeader.getSessionID() != _sessionID){
                     _sessionID = answerHeader.getSessionID();
-                    messageArea.append("Your new session ID: "new String().valueOf((int)answerHeader.getSessionID()) + "\n");
+                    messageArea.append("Your new session ID: " + new String().valueOf((int)answerHeader.getSessionID()) + "\n");
                     if (_name.isEmpty()){
                         _name = getName("Write your name");
                         out.write(new header(2, 0, _name, _sessionID).getBinHeader());
