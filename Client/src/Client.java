@@ -151,15 +151,15 @@ public class Client {
                         }else if(answerHeader.getAnswer() == 4){
                             messageArea.append("ERROR: You are already in the room\n");
                         }else if(answerHeader.getAnswer() == 5){
-                            messageArea.append(answerHeader.getData() + "\n");
+                            messageArea.append(answerHeader.getData() + " has sent you an invitation\n");
                         }else if(answerHeader.getAnswer() == 6){
-                            messageArea.append(answerHeader.getData() + "\n");
+                            messageArea.append("You don't have any invitation\n");
                         }
                     }
                     else if(answerHeader.getOperationID() == 7)
                     {
                         if (answerHeader.getAnswer() == 1){
-                            messageArea.append(answerHeader.getData() + "\n");
+                            messageArea.append("You have left the room\n");
                         }
                     }
                     else if(answerHeader.getOperationID() == 8)

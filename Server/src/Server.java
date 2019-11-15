@@ -122,7 +122,7 @@ public class Server {
                                     int otherI = other(clientListNR);
     
                                     invitationSet.add(openClients.get(otherI));
-                                    openClients.get(otherI)._out.write(new header(3, 5, name + " has sent you an invitation", openClients.get(otherI)._sessionID).getBinHeader());
+                                    openClients.get(otherI)._out.write(new header(3, 5, name, openClients.get(otherI)._sessionID).getBinHeader());
                                 }else{
                                     out.write(new header(3,4,"",sessionID).getBinHeader());
                                 }
@@ -140,7 +140,7 @@ public class Server {
                                         room.get(1)._out.write(new header(10, 0, room.get(0).getName() + " has joined the room", room.get(1).getSessionID()).getBinHeader());
                                         invitationSet.clear();
                                     }else{
-                                        out.write(new header(3, 6, "You don't have any invitation", sessionID).getBinHeader());
+                                        out.write(new header(3, 6, "", sessionID).getBinHeader());
                                     }
                                 }else{
                                     out.write(new header(3,4,"",sessionID).getBinHeader());
@@ -157,7 +157,7 @@ public class Server {
                                         openClients.get(otherI)._out.write(new header(3, 2, "", openClients.get(otherI)._sessionID).getBinHeader());
                                         invitationSet.remove(openClients.get(clientListNR));
                                     }else{
-                                        out.write(new header(3, 6, "You don't have any invitation", sessionID).getBinHeader());
+                                        out.write(new header(3, 6, "", sessionID).getBinHeader());
                                     }
                                 }else{
                                     out.write(new header(3,4,"",sessionID).getBinHeader());
@@ -180,7 +180,7 @@ public class Server {
                                 openClients.get(otherI)._out.write(new header(10, 0, name + " has left the room", openClients.get(otherI)._sessionID).getBinHeader());
                             }
                             room.reset();
-                            out.write(new header(7, 1, "You have left the room", sessionID).getBinHeader());
+                            out.write(new header(7, 1, "", sessionID).getBinHeader());
                         } else if (command.getOperationID() == 8) {
                             if (room.isActive()) {
                                 room.reset();
@@ -189,7 +189,7 @@ public class Server {
                                     openClients.get(otherI)._out.write(
                                             new header(10, 0, name + " has left the room", sessionID).getBinHeader());
                                 }
-                                out.write(new header(7, 1, "You have left the room", sessionID).getBinHeader());
+                                out.write(new header(7, 1, "", sessionID).getBinHeader());
                             }
                             openClients.remove(clientListNR);
                             out.write(new header(8, 1, "", sessionID).getBinHeader());
@@ -270,9 +270,9 @@ public class Server {
                     if (isActive()){
                         try {
                             if (i == 0){
-                                cList[1]._out.write(new header(9, 0, "Client " + cOut._name + " is available", cList[1]._sessionID).getBinHeader());
+                                cList[1]._out.write(new header(10, 0, "Client " + cOut._name + " is available", cList[1]._sessionID).getBinHeader());
                             }else if (i == 1)
-                                cList[0]._out.write(new header(9, 0, "Client " + cOut._name + " is available", cList[0]._sessionID).getBinHeader());
+                                cList[0]._out.write(new header(10, 0, "Client " + cOut._name + " is available", cList[0]._sessionID).getBinHeader());
                         } catch (Exception e) {
                             //TODO Handle exception
                         }
