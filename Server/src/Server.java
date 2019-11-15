@@ -33,7 +33,7 @@ public class Server {
 
     public static void main(String[] args) throws Exception {
         System.out.println("The chat server is running...");
-        ExecutorService pool = Executors.newFixedThreadPool(3);
+        ExecutorService pool = Executors.newFixedThreadPool(50);
         try (ServerSocket listener = new ServerSocket(59001)) {
             while (true) {
                 pool.execute(new Handler(listener.accept()));//FIXME: Kick additional client

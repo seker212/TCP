@@ -143,7 +143,7 @@ public class Client {
                     else if(answerHeader.getOperationID() == 3)
                     {
                         if (answerHeader.getAnswer() == 1){
-                            //TODO: Should here be sth?
+                            messageArea.append("Invitation accepted" + "\n");
                         }else if(answerHeader.getAnswer() == 2){
                             messageArea.append("Invitation refused" + "\n");
                         }else if(answerHeader.getAnswer() == 3){
