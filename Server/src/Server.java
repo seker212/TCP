@@ -192,6 +192,7 @@ public class Server {
                                 out.write(new header(7, 1, "", sessionID).getBinHeader());
                             }
                             openClients.remove(clientListNR);
+                            names.remove(name);
                             out.write(new header(8, 1, "", sessionID).getBinHeader());
                         }
                     }
@@ -297,7 +298,7 @@ public class Server {
 
         public clientOut get(int index) throws NullPointerException{
             if (checktable[index] == false){
-                throw new NullPointerException();
+                throw new  NullPointerException();
             }
             return cList[index];
         }
