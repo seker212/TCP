@@ -1,15 +1,6 @@
 # TCP
 ### TS_lab_project
 
-#### TODO:
- - [x] Konstrukcja nagłówka
- - [x] Forma konstruowania komunikatu przez klientów
- - [x] Wysyłanie i odbieranie komunikatu
- - [x] Wysyłanie przez serwer komunikatu do **wskazanego** klienta (Unicast)
- - [x] Wysyłanie przez serwer komuniaktu do obu klientów (Multicast/Broadcast)
- - [x] Obsługa komunikatów
- - [ ] Obsługa błędów
-
 #### Polecenie:
 <ul>
 <strong>Wariant 8 – model komunikacji 2↔1</strong>
